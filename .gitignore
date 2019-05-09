@@ -1,3 +1,7 @@
+# Others
+.vscode/
+dist/
+
 # Logs
 logs
 *.log

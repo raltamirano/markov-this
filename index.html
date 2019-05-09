@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Markov this!</title>
+        <script src="dist/markov-this.js"></script>
+    </head>
+    <body>
+        <h1>Markov this!</h1>
+        <h3>Markov this text:</h3>
+        <div>
+            <textarea id="data" cols="80" rows="15"></textarea>
+        </div>
+        <div>
+            <button onclick="produceText()">Produce!</button>
+        </div>
+        <ul id="results">
+        </ul>
+        <script type="text/javascript">
+            function produceText() {
+                const m = new markov.Markov("Paraphraser")
+                m.learn(getInputData())
+                const tokens = m.tokens()
+                const startingToken = tokens[Math.floor(Math.random() * tokens.length)]
+                const result = m.produce(startingToken, 10)
+                addResult(result)
+            }
+
+            function getInputData() {
+                return document.getElementById("data").value
+            }
+
+            function addResult(text) {
+                const listItem = document.createElement("li");                
+                listItem.appendChild(document.createTextNode(text));
+                document.getElementById("results").appendChild(listItem)
+            }
+        </script>
+    </body>
+</html>
