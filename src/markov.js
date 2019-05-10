@@ -2,7 +2,8 @@ import Analyzer from './analyzer';
 import TextLinesAnalyzer from './analyzers/text-lines';
 
 export default class Markov {
-    static get END_OF_ITEM() { return '/*/*/' }
+    static get START_OF_ITEM() { return '^^^^^' }
+    static get END_OF_ITEM()   { return '$$$$$' }
 
     constructor(name, analyzer) {
         this.name = name
@@ -11,15 +12,40 @@ export default class Markov {
     }
 
     learn(data) {
+        var analyzed = {}
+        analyzed[Markov.START_OF_ITEM] = {}
+
         this.analyzer.toItems(data).map(this.analyzer.toTokens).forEach(et => {
             for (let index = 0; index < et.length; index++) {
                 const token = et[index];
-                if (!(token in this.dict)) this.dict[token] = {}
-                const nextToken = (index < (et.length-1)) ?  et[index+1] : Markov.END_OF_ITEM;
-                if (!(nextToken in this.dict[token])) this.dict[token][nextToken] = 1
-                else this.dict[token][nextToken] = this.dict[token][nextToken] + 1
+
+                if (index == 0) {
+                    if (!(token in analyzed[Markov.START_OF_ITEM]))
+                        analyzed[Markov.START_OF_ITEM][token] = 1
+                    else
+                        analyzed[Markov.START_OF_ITEM][token] = analyzed[Markov.START_OF_ITEM][token] + 1
+                }
+
+                if (!(token in analyzed)) analyzed[token] = {}
+                const nextToken = (index < (et.length-1)) ? et[index+1] : Markov.END_OF_ITEM;
+                if (!(nextToken in analyzed[token])) analyzed[token][nextToken] = 1
+                else analyzed[token][nextToken] = analyzed[token][nextToken] + 1
             }
         });
+
+        //console.log("info=" + JSON.stringify(analyzed, null, 2))
+
+        this.dict = {}
+        Object.keys(analyzed).forEach(key => {
+            const total = Object.keys(analyzed[key]).map(e => analyzed[key][e]).reduce((a, b) => a + b)
+            Object.keys(analyzed[key]).forEach(nextKey => {
+                if (!(key in this.dict))
+                    this.dict[key] = {}
+                this.dict[key][nextKey] = Math.round((analyzed[key][nextKey] * 100.0 / total) * 100) / 100
+            })            
+        });
+
+        //console.log("info2=" + JSON.stringify(this.dict, null, 2))
     }
 
     tokens() {
