@@ -18,7 +18,8 @@
             function addResult(text) {
                 const listItem = document.createElement("li");                
                 listItem.appendChild(document.createTextNode(text));
-                document.getElementById("results").appendChild(listItem)
+                const results = document.getElementById("results")
+                results.insertBefore(listItem, results.firstChild)
             }
         </script>
     </head>
