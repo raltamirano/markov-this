@@ -45,7 +45,7 @@ export default class Markov {
             })            
         });
 
-        //console.log("info2=" + JSON.stringify(this.dict, null, 2))
+        console.log("info2=" + JSON.stringify(this.dict, null, 2))
     }
 
     tokens() {
@@ -55,7 +55,31 @@ export default class Markov {
     produce() {
         const result = []
 
+        let token = this.weightedRand(this.dict[Markov.START_OF_ITEM])()
+
+        let counter = 0
+        while (Markov.END_OF_ITEM !== token) {
+            counter++
+            result.push(token)
+
+            token = this.weightedRand(this.dict[token])()
+
+            if (counter > 100) break;
+        }
+
         return result.join(' ')
+    }
+
+    weightedRand(spec) {
+        var i, j, table = [];
+        for (i in spec) {
+          for (j=0; j<spec[i]*10; j++)
+            table.push(i);
+        }
+
+        return function() {
+          return table[Math.floor(Math.random() * table.length)];
+        }
     }
 }
 

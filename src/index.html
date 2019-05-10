@@ -7,8 +7,7 @@
                 const m = new markov.Markov("Paraphraser")
                 m.learn(getInputData())
                 const tokens = m.tokens()
-                const startingToken = tokens[Math.floor(Math.random() * tokens.length)]
-                const result = m.produce(startingToken, 10)
+                const result = m.produce()
                 addResult(result)
             }
 
@@ -27,7 +26,7 @@
         <h1>Markov this!</h1>
         <h3>Create a Markov chain from this text:</h3>
         <div>
-            <textarea id="data" cols="80" rows="15"></textarea>
+            <textarea id="data" cols="80" rows="10"></textarea>
         </div>
         <div>
             <button onclick="produceText()">Produce!</button>
