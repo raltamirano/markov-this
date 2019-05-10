@@ -41,7 +41,7 @@ export default class Markov {
             Object.keys(analyzed[key]).forEach(nextKey => {
                 if (!(key in this.dict))
                     this.dict[key] = {}
-                this.dict[key][nextKey] = Math.round((analyzed[key][nextKey] * 100.0 / total) * 100) / 100
+                this.dict[key][nextKey] = Math.round((analyzed[key][nextKey] * 100.0 / total)) / 100
             })            
         });
 
@@ -52,8 +52,10 @@ export default class Markov {
         return Object.keys(this.dict)
     }
 
-    produce(initial, length) {
-        return "abc"
+    produce() {
+        const result = []
+
+        return result.join(' ')
     }
 }
 
