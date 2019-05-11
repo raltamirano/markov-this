@@ -22,10 +22,10 @@
                 while (alreadyProduced(result) && safetyCounter++ < 1000)
                     result = markovChain.produce() 
                 
-                if (!alreadyProduced(result))
-                    addResult(result)
-                else
-                    alert("Couldn't make something original enough!")
+                if (alreadyProduced(result))
+                    console.log("Couldn't make something original enough: " + result)
+
+                addResult(result)
             }
 
             function getInputData() {
@@ -38,7 +38,7 @@
 
                 var resultItems = document.getElementById("results").getElementsByTagName("li");
                 for (let index = 0; index < resultItems.length; index++)
-                    if (resultItems[index].innerText === text)
+                    if (resultItems[index].innerText.trim().toLowerCase() == text.trim().toLowerCase())
                         return true
 
                 return false
