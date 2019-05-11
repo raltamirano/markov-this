@@ -17,7 +17,7 @@ export default class Markov {
         var analyzed = {}
         analyzed[Markov.START_OF_ITEM] = {}
         
-        const itemsTokens = this.analyzer.toItems(data).map(this.analyzer.toTokens);
+        const itemsTokens = this.analyzer.toItems(data).map(this.analyzer.toTokens)
         if (itemsTokens.length == 0)
             throw 'Provided input data is invalid!'
 
@@ -49,7 +49,7 @@ export default class Markov {
             Object.keys(analyzed[key]).forEach(nextKey => {
                 if (!(key in this.dict))
                     this.dict[key] = {}
-                this.dict[key][nextKey] = Math.round((analyzed[key][nextKey] * 100.0 / total)) / 100
+                this.dict[key][nextKey] = (analyzed[key][nextKey] * 100.0 / total) / 100.0
             })            
         });
 
@@ -70,7 +70,7 @@ export default class Markov {
             let previous = result[result.length-this.order]
             for (let index = (result.length-this.order)+1; index < result.length; index++)
                 previous = previous + Markov.ORDER_TOKEN_SEPARATOR + result[index]
-            console.log(previous)
+
             result.push(this.weightedRand(this.dict[previous])())
             if (counter++ > 100) break;
         }
