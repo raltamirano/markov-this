@@ -3,36 +3,79 @@
     <head>
         <title>Markov this!</title>
         <script type="text/javascript">
-            function produceText() {
-                const m = new markov.Markov("Paraphraser")
-                m.learn(getInputData())
-                const tokens = m.tokens()
-                const result = m.produce()
-                addResult(result)
+            var markovChain = null;
+
+            function learn() {
+                const order = getOrder()
+                markovChain = new markov.Markov("Demo", order)
+                markovChain.learn(getInputData())
+
+                enableProduce()
+                setMessage('Learned from input data with order: ' + order)
+            }
+
+            function produce() {
+                if (markovChain == null) return
+                let result = markovChain.produce()
+
+                let safetyCounter = 0
+                while (alreadyProduced(result) && safetyCounter++ < 1000)
+                    result = markovChain.produce() 
+                
+                if (!alreadyProduced(result))
+                    addResult(result)
+                else
+                    alert("Couldn't make something original enough!")
             }
 
             function getInputData() {
                 return document.getElementById("data").value
             }
 
+            function alreadyProduced(text) {
+                if (document.getElementById("data").value.indexOf(text) >= 0)
+                    return true
+
+                var resultItems = document.getElementById("results").getElementsByTagName("li");
+                for (let index = 0; index < resultItems.length; index++)
+                    if (resultItems[index].innerText === text)
+                        return true
+
+                return false
+            }
+
+            function getOrder() {
+                return parseInt(document.getElementById("order").value)
+            }
+
             function addResult(text) {
                 const listItem = document.createElement("li");                
-                listItem.appendChild(document.createTextNode(text));
+                listItem.appendChild(document.createTextNode(text))
                 const results = document.getElementById("results")
                 results.insertBefore(listItem, results.firstChild)
+            }
+
+            function setMessage(message) {
+                document.getElementById("message").innerText = message  
+            }
+
+            function enableProduce() {
+                document.getElementById("produceButton").removeAttribute("disabled")  
             }
         </script>
     </head>
     <body>
         <h1>Markov this!</h1>
         <h3>Create a Markov chain from this text:</h3>
+        <div><textarea id="data" cols="140" rows="10"></textarea></div>
+        <div><span>Order:</span><input id="order" type="number" value="2" min="1" max="100" /></div>
         <div>
-            <textarea id="data" cols="80" rows="10"></textarea>
+            <div>
+                <button onclick="learn()">Learn</button>
+                <button onclick="produce()" id="produceButton" disabled="true">Produce</button>
+            </div>
+            <span id="message"></span>
         </div>
-        <div>
-            <button onclick="produceText()">Produce!</button>
-        </div>
-        <ul id="results">
-        </ul>
+        <div><ul id="results"></ul></div>
     </body>
 </html>

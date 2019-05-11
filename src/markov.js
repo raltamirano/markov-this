@@ -2,11 +2,13 @@ import Analyzer from './analyzer';
 import TextLinesAnalyzer from './analyzers/text-lines';
 
 export default class Markov {
-    static get START_OF_ITEM() { return '^^^^^' }
-    static get END_OF_ITEM()   { return '$$$$$' }
+    static get START_OF_ITEM()              { return '^^^^^' }
+    static get END_OF_ITEM()                { return '$$$$$' }
+    static get ORDER_TOKEN_SEPARATOR()      { return '=====' }
 
-    constructor(name, analyzer) {
+    constructor(name, order, analyzer) {
         this.name = name
+        this.order = order
         this.analyzer = analyzer || new TextLinesAnalyzer()
         this.dict = {}
     }
@@ -14,10 +16,16 @@ export default class Markov {
     learn(data) {
         var analyzed = {}
         analyzed[Markov.START_OF_ITEM] = {}
+        
+        const itemsTokens = this.analyzer.toItems(data).map(this.analyzer.toTokens);
+        if (itemsTokens.length == 0)
+            throw 'Provided input data is invalid!'
 
-        this.analyzer.toItems(data).map(this.analyzer.toTokens).forEach(et => {
-            for (let index = 0; index < et.length; index++) {
-                const token = et[index];
+        itemsTokens.forEach(it => {
+            for (let index = 0; index < it.length; index++) {
+                let token = it[index];
+                for (let orderIndex = index + 1; (orderIndex < it.length) && ((orderIndex - index) < this.order); orderIndex++)
+                    token = token + Markov.ORDER_TOKEN_SEPARATOR + it[orderIndex]
 
                 if (index == 0) {
                     if (!(token in analyzed[Markov.START_OF_ITEM]))
@@ -27,7 +35,7 @@ export default class Markov {
                 }
 
                 if (!(token in analyzed)) analyzed[token] = {}
-                const nextToken = (index < (et.length-1)) ? et[index+1] : Markov.END_OF_ITEM;
+                const nextToken = (index < (it.length-this.order)) ? it[index+this.order] : Markov.END_OF_ITEM;
                 if (!(nextToken in analyzed[token])) analyzed[token][nextToken] = 1
                 else analyzed[token][nextToken] = analyzed[token][nextToken] + 1
             }
@@ -54,18 +62,21 @@ export default class Markov {
 
     produce() {
         const result = []
-
         let token = this.weightedRand(this.dict[Markov.START_OF_ITEM])()
+        result.push(...token.split(Markov.ORDER_TOKEN_SEPARATOR))
 
-        let counter = 0
-        while (Markov.END_OF_ITEM !== token) {
-            counter++
-            result.push(token)
-
-            token = this.weightedRand(this.dict[token])()
-
-            if (counter > 100) break;
+        let counter = result.length
+        while (Markov.END_OF_ITEM !== result[result.length-1]) {
+            let previous = result[result.length-this.order]
+            for (let index = (result.length-this.order)+1; index < result.length; index++)
+                previous = previous + Markov.ORDER_TOKEN_SEPARATOR + result[index]
+            console.log(previous)
+            result.push(this.weightedRand(this.dict[previous])())
+            if (counter++ > 100) break;
         }
+
+        if (Markov.END_OF_ITEM == result[result.length-1])
+            result.pop()
 
         return result.join(' ')
     }
