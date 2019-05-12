@@ -1,4 +1,6 @@
-export default class Analyzer {
+"use strict";
+
+class Analyzer {
     /** Creates items from data (usually Markov class' learn() data) */
     toItems(data) {
         return []
@@ -9,3 +11,5 @@ export default class Analyzer {
         return []
     }
 }
+
+module.exports = Analyzer

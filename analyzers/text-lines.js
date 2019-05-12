@@ -1,6 +1,7 @@
-import Analyzer from "../analyzer";
+var Analyzer = require("../analyzer");
+"use strict"
 
-export default class TextLinesAnalyzer extends Analyzer {
+class TextLinesAnalyzer extends Analyzer {
     toItems(data) {
         return ("" + data).split('\n').map(l => l.trim()).filter(l => l.trim().length > 0)
     }
@@ -9,3 +10,5 @@ export default class TextLinesAnalyzer extends Analyzer {
         return ("" + item).split(' ')
     }
 }
+
+module.exports = TextLinesAnalyzer

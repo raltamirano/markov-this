@@ -1,7 +1,8 @@
-import Analyzer from './analyzer';
-import TextLinesAnalyzer from './analyzers/text-lines';
+var Analyzer = require("./analyzer");
+var TextLinesAnalyzer = require("./analyzers/text-lines");
+"use strict"
 
-export default class Markov {
+class Markov {
     static get START_OF_ITEM()              { return '^^^^^' }
     static get END_OF_ITEM()                { return '$$$$$' }
     static get ORDER_TOKEN_SEPARATOR()      { return '=====' }
@@ -16,7 +17,7 @@ export default class Markov {
     learn(data) {
         var analyzed = {}
         analyzed[Markov.START_OF_ITEM] = {}
-        
+
         const itemsTokens = this.analyzer.toItems(data).map(this.analyzer.toTokens)
         if (itemsTokens.length == 0)
             throw 'Provided input data is invalid!'
@@ -50,10 +51,10 @@ export default class Markov {
                 if (!(key in this.dict))
                     this.dict[key] = {}
                 this.dict[key][nextKey] = (analyzed[key][nextKey] * 100.0 / total) / 100.0
-            })            
+            })
         });
 
-        console.log("info2=" + JSON.stringify(this.dict, null, 2))
+        //console.log("info2=" + JSON.stringify(this.dict, null, 2))
     }
 
     tokens() {
@@ -94,3 +95,4 @@ export default class Markov {
     }
 }
 
+module.exports = Markov
