@@ -9,4 +9,4 @@ You can install it using NPM like this:
   ```
 
 ## Demo ##
-[Test it here!](https://raltamirano.github.io/showcase/markov-this/index.html)
+[Test it here!](https://raltamirano.github.io/showcase/markov-this/dist/index.html)
